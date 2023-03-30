@@ -9,7 +9,7 @@ const { ReadlineParser } = require('@serialport/parser-readline')
 var slider = document.getElementById("slider");
 var output = document.getElementById("slider_value");
 
-var dp = DataProcessor(5);
+var dp = new DataProcessor(5);
 output.innerHTML = slider.value;
 
 slider.oninput = function() {
@@ -93,7 +93,7 @@ function connect_to_port(port) {
     baudRate:115200
   });
 
-  const parser = serialPort.pipe(new ReadlineParser({ delimiter: '\n' }))
+  const parser = serialPort.pipe(new ReadlineParser({ delimiter: '\r\n' }))
   serialPort.on('open', update_connection_status);
   parser.on('data', retrive_array_data);
 
@@ -128,11 +128,12 @@ function retrive_array_data(input_data)
 document.getElementById('data_display').innerHTML = input_data;
   // frist tableify the data
  //console.log("Data received: " + input_data);
+
+dp.input_data(input_data.split(',').map(Number));
+
 }
 
 function process_the_ports_path_into_array(ports) {
-
-
   var ports_array = [];
   for (var i = 0; i < ports.length; i++) {
     ports_array.push(ports[i].path);
