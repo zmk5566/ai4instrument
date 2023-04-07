@@ -4,12 +4,17 @@
 
 const { SerialPort } = require('serialport')
 const { ReadlineParser } = require('@serialport/parser-readline')
+const OSC = require('osc-js')
+
+
+const { Server } = require('node-osc');
 
 
 var slider = document.getElementById("slider");
 var output = document.getElementById("slider_value");
 
 var dp = new DataProcessor(5);
+
 output.innerHTML = slider.value;
 
 slider.oninput = function() {
@@ -111,11 +116,6 @@ function connect_to_port(port) {
 
 
 function update_connection_status(){
-  var temp_dom = document.getElementById('status_text');
-  document.getElementById('serial_button').style.display = "none";
-  temp_dom.removeAttribute("class",'off');
-  temp_dom.setAttribute('class', 'on');
-  temp_dom.innerHTML = "Connected to " + port_path;
   document.getElementById("ml_refresh").style.display = "block";
   document.getElementById("ml_data_status_text").innerHTML = "Data Available";
   document.getElementById("ml_data_status_text").removeAttribute("class",'off');
@@ -129,7 +129,7 @@ document.getElementById('data_display').innerHTML = input_data;
   // frist tableify the data
  //console.log("Data received: " + input_data);
 
-dp.input_data(input_data.split(',').map(Number));
+dp.input_data(input_data);
 
 }
 
@@ -141,8 +141,115 @@ function process_the_ports_path_into_array(ports) {
   return ports_array;
 }
 
-// Set a timeout that will check for new serialPorts every 2 seconds.
-// This timeout reschedules itself.
-setTimeout(listPorts, 2000);
 
-listSerialPorts()
+var oscServer = new Server(8080, '0.0.0.0', () => {
+  console.log('OSC Server is listening');
+  var temp_dom = document.getElementById('status_text');
+  temp_dom.removeAttribute("class",'off');
+  temp_dom.setAttribute('class', 'on');
+  temp_dom.innerHTML = "Server Started on  " + oscServer.port;
+});
+
+oscServer.on('message', function (msg) {
+  var topic_name = msg.shift();
+  //check the topic name and process the logic
+  if (topic_name == "/arduino/sensors") {
+    retrive_array_data(msg);
+  }
+    
+  //console.log("Message",msg);
+  //oscServer.close();
+});
+
+function generate_form(){
+  document.getElementById("training_table").appendChild(generate_table_training(5));
+}
+
+
+function generate_table_training(number_of_inputs){
+  var temp_dom = document.createElement('table');
+  temp_dom.setAttribute('id', 'training_table');
+  // a typical data json is like this data_json = [{index:}]
+
+
+  // create five colume titles , which are : sample index, name, existing training samples, a button for press for training , a button for remove all samples
+  var temp_row = document.createElement('tr');
+  var temp_input = document.createElement('th');
+  temp_input.innerHTML = "Sample Index";
+  
+  temp_row.appendChild(temp_input);
+
+
+  temp_input = document.createElement('th');
+  temp_input.innerHTML = "Custom Name";
+
+  temp_row.appendChild(temp_input);
+  
+  temp_input = document.createElement('th');
+  temp_input.innerHTML = "Existing Training Samples";
+  temp_row.appendChild(temp_input);
+  temp_input = document.createElement('th');
+  temp_input.innerHTML = "Press for Training";
+  temp_row.appendChild(temp_input);
+  temp_input = document.createElement('th');
+  temp_input.innerHTML = "Remove All Samples";
+  temp_row.appendChild(temp_input);
+  temp_dom.appendChild(temp_row);
+
+  for (var i=0; i <number_of_inputs;i++){
+    // append a row for each input
+    temp_row = document.createElement('tr');
+
+
+    temp_input = document.createElement('td');
+    temp_input.innerHTML = i;
+    temp_row.appendChild(temp_input);
+
+    //add another column for input name, with a default name of input_1, input_2, input_3 etc. It can allow the user to do text input 
+    temp_input = document.createElement('td');
+    temp_input.setAttribute('id', 'training_name_'+i);
+    temp_text = document.createElement('input');
+    temp_text.setAttribute('type', 'text');
+    temp_text.setAttribute('id', 'training_name_input_'+i);
+    temp_text.setAttribute('value', 'input_'+i);
+    temp_input.appendChild(temp_text);
+    temp_row.appendChild(temp_input);
+
+    
+    
+    
+
+    temp_input = document.createElement('td');
+    temp_input.setAttribute('id', 'training_sample_'+i);
+    temp_input.innerHTML = "0";
+    temp_row.appendChild(temp_input);
+    temp_input = document.createElement('td');
+    temp_input.setAttribute('id', 'training_button_'+i);
+    temp_input.setAttribute('class', 'btn btn-primary');
+    temp_input.innerHTML = "Train";
+    temp_input.addEventListener('click', function() {
+      console.log('train button clicked');
+    }
+    );
+    temp_row.appendChild(temp_input);
+
+    temp_input = document.createElement('td');
+    var temp_button = document.createElement('button');
+    temp_button.setAttribute('id', 'remove_all_button_'+i);
+    temp_button.setAttribute('class', 'btn btn-primary');
+    temp_button.innerHTML = "Remove All";
+    temp_button.addEventListener('click', function() {
+      console.log('remove all button clicked');
+    }
+    );
+    temp_input.appendChild(temp_button);
+
+    temp_row.appendChild(temp_input);
+
+    temp_dom.appendChild(temp_row);
+
+
+  }
+  return temp_dom;
+
+}
