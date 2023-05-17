@@ -38,6 +38,8 @@ function draw(){
 
   ellipse(temp_a, temp_b, temp_c,temp_c);
 
+  makePrediction();
+
   rect(0,0,20,20);
 }
 
@@ -75,6 +77,12 @@ function keyPressed() {
   }
 }
 
+function makePrediction(){
+  if (predictMode){
+    model.predict(input_variables, gotResults);
+  }
+}
+
 function mouseDragged(){
   if (predictMode){
     model.predict([mouseX, mouseY], gotResults);
@@ -96,7 +104,10 @@ function gotResults(error, results) {
     let r = results[0]['value'];
     let g = results[1]['value'];
     let b = results[2]['value'];
+
     fill(r, g, b);
-    circle(mouseX, mouseY, 20);
+    circle(input_variables[0], input_variables[1], input_variables[2]);
+
+    //TODO add the sin logic here for controlling the music
   }
 }
