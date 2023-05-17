@@ -3,7 +3,7 @@
 // All of the Node.js APIs are available in this process.
 
 const { SerialPort } = require('serialport')
-const { ReadlineParser } = require('@serialport/parser-readline')
+//const { ReadlineParser } = require('@serialport/parser-readline')
 const OSC = require('osc-js')
 
 
@@ -12,6 +12,8 @@ const { Server } = require('node-osc');
 
 var slider = document.getElementById("slider");
 var output = document.getElementById("slider_value");
+
+var input_variables = [0,0,0];
 
 var dp = new DataProcessor(5);
 
@@ -128,8 +130,8 @@ function retrive_array_data(input_data)
 document.getElementById('data_display').innerHTML = input_data;
   // frist tableify the data
  //console.log("Data received: " + input_data);
-
-dp.input_data(input_data);
+ input_variables = input_data;
+//dp.input_data(input_data);
 
 }
 
@@ -142,7 +144,7 @@ function process_the_ports_path_into_array(ports) {
 }
 
 
-var oscServer = new Server(8080, '0.0.0.0', () => {
+var oscServer = new Server(12000, '0.0.0.0', () => {
   console.log('OSC Server is listening');
   var temp_dom = document.getElementById('status_text');
   temp_dom.removeAttribute("class",'off');
@@ -156,6 +158,8 @@ oscServer.on('message', function (msg) {
   if (topic_name == "/arduino/sensors") {
     retrive_array_data(msg);
   }
+
+  console.log("recieved something");
     
   //console.log("Message",msg);
   //oscServer.close();
