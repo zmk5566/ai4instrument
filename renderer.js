@@ -7,13 +7,26 @@ const { SerialPort } = require('serialport')
 const OSC = require('osc-js')
 
 
-const { Server } = require('node-osc');
+const { Server,Client} = require('node-osc');
 
+var input_variables = [0,0,0];
+
+var predict_variables = [0,0,0];
+
+
+const client = new Client('127.0.0.1', 8788);
+
+
+
+function outputPrediction(){
+  client.send('/pipafan', predict_variables, () => {
+    client.close();
+  });
+}
 
 var slider = document.getElementById("slider");
 var output = document.getElementById("slider_value");
 
-var input_variables = [0,0,0];
 
 var dp = new DataProcessor(5);
 

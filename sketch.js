@@ -105,9 +105,16 @@ function gotResults(error, results) {
     let g = results[1]['value'];
     let b = results[2]['value'];
 
+    predict_variables[0] = results[0]['value'];
+    predict_variables[1] = results[1]['value'];
+    predict_variables[2] = results[2]['value'];
+
+
     fill(r, g, b);
     circle(input_variables[0], input_variables[1], input_variables[2]);
 
     //TODO add the sin logic here for controlling the music
+
+    outputPrediction();
   }
 }
