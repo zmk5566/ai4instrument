@@ -1,0 +1,1 @@
+{"inputUnits":[4],"outputUnits":3,"inputs":{"0":{"dtype":"number","min":420,"max":3730},"1":{"dtype":"number","min":180,"max":3630},"2":{"dtype":"number","min":42,"max":373},"3":{"dtype":"number","min":18,"max":363}},"outputs":{"0":{"dtype":"number","min":139,"max":247},"1":{"dtype":"number","min":70,"max":146},"2":{"dtype":"number","min":11,"max":111}},"isNormalized":true}

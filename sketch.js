@@ -6,6 +6,7 @@
 let trainButton, saveButton;
 let sliderR, sliderG, sliderB;
 let predictMode = false;
+let input_recieved = false;
 
 function setup() {
   createCanvas(windowWidth, 400);
@@ -27,14 +28,32 @@ function setup() {
   model = ml5.neuralNetwork(options);
 }
 
+function custom_load(){
+  model.load('model/model.json', modelLoaded);
+}
+
+function modelLoaded(){
+  console.log('model loaded');
+  predictMode = true;
+}
+
 function draw(){
+  
   noStroke();
-  fill(sliderR.value(), sliderG.value(), sliderB.value());
+  if (predictMode == false){
+    fill(sliderR.value(), sliderG.value(), sliderB.value());
+    }else{
+    fill(predict_variables[0], predict_variables[1], predict_variables[2]);
+    }
+  
 
   // map three value from range 0-1024 to 0-width, 0-height, 0-255
-  var temp_a = map(input_variables[0], 0, 1024, 0, width);
-  var temp_b = map(input_variables[1], 0, 1024, 0, height);
-  var temp_c = map(input_variables[2], 0, 1024, 0, 255);
+  var temp_a = map(input_variables[0], 0, 4096, 0, width);
+  var temp_b = map(input_variables[1], 0, 4096, 0, height);
+  var temp_c = map(input_variables[2], 0, 4096, 0, 255);
+
+
+
 
   ellipse(temp_a, temp_b, temp_c,temp_c);
 
@@ -64,12 +83,13 @@ function keyPressed() {
     let outputs = [sliderR.value(), sliderG.value(), sliderB.value()]
     console.log(inputs, outputs);
     model.addData(inputs, outputs);
-    
+    console.log("added data");
     fill(sliderR.value(), sliderG.value(), sliderB.value());
+
     
-    var temp_a = map(input_variables[0], 0, 1024, 0, width);
-    var temp_b = map(input_variables[1], 0, 1024, 0, height);
-    var temp_c = map(input_variables[2], 0, 1024, 0, 255);
+    var temp_a = map(input_variables[0], 0, 4096, 0, width);
+    var temp_b = map(input_variables[1], 0, 4096, 0, height);
+    var temp_c = map(input_variables[2], 0, 4096, 0, 255);
   
     ellipse(temp_a, temp_b, temp_c,temp_c);
 
@@ -78,16 +98,15 @@ function keyPressed() {
 }
 
 function makePrediction(){
-  if (predictMode){
+
+  if (predictMode && input_recieved){
+    console.log("making prediections");
+    //console.log(input_variables);
     model.predict(input_variables, gotResults);
   }
 }
 
-function mouseDragged(){
-  if (predictMode){
-    model.predict([mouseX, mouseY], gotResults);
-  }
-}
+
 
 function finishedTraining() {
   console.log('finished training.');
@@ -97,7 +116,7 @@ function finishedTraining() {
 
 function gotResults(error, results) {
   if (error) {
-    console.error(error);
+    //console.error(error);
     return;
   }
   if (results){
@@ -105,13 +124,16 @@ function gotResults(error, results) {
     let g = results[1]['value'];
     let b = results[2]['value'];
 
-    predict_variables[0] = results[0]['value'];
-    predict_variables[1] = results[1]['value'];
-    predict_variables[2] = results[2]['value'];
+    predict_variables[0] = results[0]['value']+0.00001;
+    predict_variables[1] = results[1]['value']+0.00001;
+    predict_variables[2] = results[2]['value']+0.00001;
 
 
     fill(r, g, b);
-    circle(input_variables[0], input_variables[1], input_variables[2]);
+    console.log(r, g, b);
+    //ellipse
+    //circle(input_variables[0], input_variables[1], input_variables[2]);
+    //rect(input_variables[0], input_variables[1], input_variables[2], input_variables[2]);
 
     //TODO add the sin logic here for controlling the music
 

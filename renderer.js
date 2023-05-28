@@ -20,7 +20,8 @@ const client = new Client('127.0.0.1', 8788);
 
 function outputPrediction(){
   client.send('/pipafan', predict_variables, () => {
-    client.close();
+    console.log("sending some results")
+    //client.close();
   });
 }
 
@@ -169,6 +170,11 @@ oscServer.on('message', function (msg) {
   var topic_name = msg.shift();
   //check the topic name and process the logic
   if (topic_name == "/arduino/sensors") {
+
+    if (input_recieved == false) {
+      input_recieved = true;
+    }
+
     retrive_array_data(msg);
   }
 
