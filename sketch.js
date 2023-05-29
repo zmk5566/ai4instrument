@@ -130,14 +130,16 @@ function gotResults(error, results) {
 
 
 
-    sliderR.value(predict_variables[0]);
-    sliderG.value(predict_variables[1]);
-    sliderB.value(predict_variables[2]);
 
     predict_variables[0] = results[0]['value']+0.00001;
     predict_variables[1] = results[1]['value']+0.00001;
     predict_variables[2] = results[2]['value']+0.00001;
 
+    
+    sliderR.value(predict_variables[0]);
+    sliderG.value(predict_variables[1]);
+    sliderB.value(predict_variables[2]);
+    
 
     fill(r, g, b);
     console.log(r, g, b);
