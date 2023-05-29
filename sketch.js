@@ -15,6 +15,10 @@ function setup() {
   sliderG = createSlider(0, 255, random(255));
   sliderB = createSlider(0, 255, random(255));
 
+  sliderR.style('width', '400px');
+  sliderG.style('width', '400px');
+  sliderB.style('width', '400px');
+
   trainButton = createButton('train');
   trainButton.mousePressed(trainModel);
 
@@ -123,6 +127,12 @@ function gotResults(error, results) {
     let r = results[0]['value'];
     let g = results[1]['value'];
     let b = results[2]['value'];
+
+
+
+    sliderR.value(predict_variables[0]);
+    sliderG.value(predict_variables[1]);
+    sliderB.value(predict_variables[2]);
 
     predict_variables[0] = results[0]['value']+0.00001;
     predict_variables[1] = results[1]['value']+0.00001;
